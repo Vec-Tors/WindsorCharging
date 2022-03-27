@@ -3,12 +3,15 @@ import { ref } from "vue";
 /// <reference path="node_modules/@types/turf/index.d.ts" />
 
 import MapView from "../components/mapView.vue";
+import ConfigBox from "../components/configBox.vue";
+/*
 import turf from "turf";
 import circle from "@turf/circle";
 import polygonToLine from "@turf/polygon-to-line";
 import lineIntersect from "@turf/line-intersect";
 import booleanPointInPolygon from "@turf/boolean-point-in-polygon";
 import type { Feature, Point, GeoJsonProperties } from "geojson";
+*/
 let points = ref([
   [42.167112, -82.816715],
   [42.173674, -82.819467],
@@ -37,6 +40,7 @@ let points = ref([
   [42.3172986, -83.0444972],
   [42.241722, -83.102857],
 ]);
+/*
 let maxArea = turf.polygon([
   [
     [-82.9131248, 42.3393879],
@@ -255,9 +259,9 @@ let genpoints2 = generatePoints(
 let cleaned2 = cleanPoints(genpoints2);
 addToPoints(cleanedPoints);
 addToPoints(cleaned2);
-addToPoints(generatePoints(genpoints2, radius));
 console.log(genpoints, "ok");
-/*
+console.log(genpoints2, "ok");
+points.value.push([genpoints2[402][1], genpoints2[402][0]]);
 async function recursivePointGen(
   array: Array<[number, number]>
 ): Promise<[number, number][]> {
@@ -299,16 +303,7 @@ recursivePointGen(points.value, 0).then((pnts) => {
   <main>
     <MapView :points="points" class="map" />
     <div class="cont">
-      <div class="obj">t</div>
-      <div class="obj">t</div>
-      <div class="obj">t</div>
-      <div class="obj">
-        <p>t</p>
-      </div>
-      <div class="obj">t</div>
-      <div class="obj">t</div>
-      <div class="obj">t</div>
-      <div class="obj">t</div>
+      <ConfigBox class="obj" />
     </div>
   </main>
 </template>

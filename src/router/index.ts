@@ -13,3 +13,18 @@ const router = createRouter({
 });
 
 export default router;
+
+interface apiSend {
+  //lat long
+  coordinates: [number, number];
+  chargerType: Array<
+    | "NEMA1450"
+    | "NEMA515"
+    | "NEMA520"
+    | "J1772"
+    | "J1772COMBO"
+    | "CHADEMO"
+    | "TESLA"
+  >;
+  chargeLevel: Array<1 | 2 | "dc_fast" | "legacy">;
+}

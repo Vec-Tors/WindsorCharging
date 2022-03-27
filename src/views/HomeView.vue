@@ -297,11 +297,20 @@ recursivePointGen(points.value, 0).then((pnts) => {
 });
 //newerPoints.forEach((pnt) => points.push(pnt));
       */
+fetch(
+  "https://developer.nrel.gov/api/alt-fuel-stations/v1/nearest.geojson?api_key=rx9NyAm69CnSZXGoAAObTyGGnXD4LgND6ui3gYkX&location=1617+Cole+Blvd+Golden+CO&fuel_type=ELEC&limit=1"
+)
+  .then((res) => res.json())
+  .then(console.log);
 </script>
 
 <template>
   <main>
-    <MapView :points="points" class="map" />
+    <MapView
+      :OldPoints="points"
+      :NewPoints="[[-83.1106666, 42.1633367]]"
+      class="map"
+    />
     <div class="cont">
       <ConfigBox class="obj" />
     </div>
@@ -321,29 +330,13 @@ main {
   z-index: 0;
 }
 .cont {
-  position: fixed;
-  z-index: 1;
-  top: 90px;
-  left: 0;
-  bottom: 20px;
-  height: 98%;
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  align-content: flex-start;
-  justify-content: flex-start;
-  align-items: flex-start;
-  padding-bottom: 40px;
 }
 .obj {
   position: relative;
   z-index: 2;
-  background-color: green;
-  opacity: 0.5;
-  width: 90px;
-  height: 100px;
-  margin: 7%;
-  text-align: center;
-  text-decoration: underline;
+  margin-top: 6%;
+  margin-left: 1.5%;
+  padding: 1.2%;
+  width: 10%;
 }
 </style>

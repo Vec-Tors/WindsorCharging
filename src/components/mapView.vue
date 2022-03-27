@@ -37,5 +37,8 @@ export default {
     };
   },
   computed: {},
+  mounted() {
+    console.log(this.points);
+  },
 };
 </script>

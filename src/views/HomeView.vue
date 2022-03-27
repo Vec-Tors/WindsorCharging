@@ -1,50 +1,314 @@
 <script setup lang="ts">
 import { ref } from "vue";
+/// <reference path="node_modules/@types/turf/index.d.ts" />
+
 import MapView from "../components/mapView.vue";
-let points = ref({
-  points: [
-    [42.167112, -82.816715],
-    [42.173674, -82.819467],
-    [42.183564, -82.83277],
-    [42.2498644, -82.9496771],
-    [42.226898, -82.994958],
-    [42.226869, -82.995019],
-    [42.308918, -82.870616],
-    [42.036245, -82.714061],
-    [42.034764, -82.917965],
-    [42.314019, -82.916044],
-    [42.24031, -83.013994],
-    [42.313713, -82.924253],
-    [42.282045, -82.981717],
-    [42.273189, -83.00278],
-    [42.27347, -83.00262],
-    [42.273293, -83.00354],
-    [42.274246, -83.006671],
-    [42.292654, -83.012514],
-    [42.305572, -83.001366],
-    [42.299522, -83.012098],
-    [42.245404, -83.058533],
-    [42.273169, -83.047966],
-    [42.239116, -82.550227],
-    [42.325065, -83.007556],
-    [42.3172986, -83.0444972],
-    [42.241722, -83.102857],
+import turf from "turf";
+import circle from "@turf/circle";
+import polygonToLine from "@turf/polygon-to-line";
+import lineIntersect from "@turf/line-intersect";
+import booleanPointInPolygon from "@turf/boolean-point-in-polygon";
+import type { Feature, Point, GeoJsonProperties } from "geojson";
+let points = ref([
+  [42.167112, -82.816715],
+  [42.173674, -82.819467],
+  [42.183564, -82.83277],
+  [42.2498644, -82.9496771],
+  [42.226898, -82.994958],
+  [42.226869, -82.995019],
+  [42.308918, -82.870616],
+  [42.036245, -82.714061],
+  [42.034764, -82.917965],
+  [42.314019, -82.916044],
+  [42.24031, -83.013994],
+  [42.313713, -82.924253],
+  [42.282045, -82.981717],
+  [42.273189, -83.00278],
+  [42.27347, -83.00262],
+  [42.273293, -83.00354],
+  [42.274246, -83.006671],
+  [42.292654, -83.012514],
+  [42.305572, -83.001366],
+  [42.299522, -83.012098],
+  [42.245404, -83.058533],
+  [42.273169, -83.047966],
+  [42.239116, -82.550227],
+  [42.325065, -83.007556],
+  [42.3172986, -83.0444972],
+  [42.241722, -83.102857],
+]);
+let maxArea = turf.polygon([
+  [
+    [-82.9131248, 42.3393879],
+    [-82.9389599, 42.3442728],
+    [-82.9505755, 42.3415996],
+    [-82.954022, 42.3363604],
+    [-82.9780657, 42.3313733],
+    [-82.9876948, 42.3279436],
+    [-82.996551, 42.3285743],
+    [-83.0128035, 42.3270417],
+    [-83.0463341, 42.3211136],
+    [-83.0724358, 42.3119752],
+    [-83.0926829, 42.2921683],
+    [-83.1066024, 42.266963],
+    [-83.107849, 42.2597079],
+    [-83.1103604, 42.2574781],
+    [-83.1076676, 42.255728],
+    [-83.1083813, 42.2530742],
+    [-83.1066781, 42.2521286],
+    [-83.1068565, 42.2488603],
+    [-83.1132144, 42.245592],
+    [-83.1214974, 42.2442457],
+    [-83.1268612, 42.2383242],
+    [-83.1226046, 42.1907163],
+    [-83.1052363, 42.1896091],
+    [-83.1081246, 42.1820144],
+    [-83.1129871, 42.177218],
+    [-83.1128717, 42.1724214],
+    [-83.112799, 42.1697239],
+    [-83.1028063, 42.1697111],
+    [-83.1008663, 42.1679267],
+    [-83.1064792, 42.1658878],
+    [-83.1106666, 42.1633367],
+    [-83.1088055, 42.1595329],
+    [-83.1123638, 42.1526405],
+    [-83.113456, 42.1514213],
+    [-83.1154066, 42.151602],
+    [-83.1151407, 42.1496523],
+    [-83.1140945, 42.1478527],
+    [-83.1152635, 42.1451445],
+    [-83.1157184, 42.1409037],
+    [-83.1168598, 42.1399722],
+    [-83.1163965, 42.128817],
+    [-83.1151269, 42.1241378],
+    [-83.1138125, 42.1213881],
+    [-83.1138715, 42.1198479],
+    [-83.1124445, 42.1170222],
+    [-83.1121656, 42.1148086],
+    [-83.1141827, 42.110891],
+    [-83.1152986, 42.1042021],
+    [-83.1137608, 42.1003331],
+    [-83.1142831, 42.0935345],
+    [-83.113072, 42.090383],
+    [-83.1117798, 42.0869918],
+    [-83.1132366, 42.0857102],
+    [-83.1147791, 42.0848108],
+    [-83.1169058, 42.0785708],
+    [-83.1170391, 42.0736076],
+    [-83.1171727, 42.0716072],
+    [-83.1167056, 42.0651468],
+    [-83.1164579, 42.059044],
+    [-83.1175275, 42.0544269],
+    [-83.1095856, 42.0469414],
+    [-83.084606, 42.0391045],
+    [-83.0257348, 42.0259619],
+    [-83.0070977, 42.0200683],
+    [-82.9857189, 42.0102178],
+    [-82.9730591, 42.0036326],
+    [-82.9645197, 41.9988963],
+    [-82.9553389, 41.9923569],
+    [-82.9496639, 41.9894302],
+    [-82.9465639, 41.9883535],
+    [-82.9445368, 41.9876595],
+    [-82.9435397, 41.9865827],
+    [-82.936033, 41.9832959],
+    [-82.9308015, 41.9826246],
+    [-82.9272417, 41.9824165],
+    [-82.9260627, 41.9815787],
+    [-82.9255703, 41.9803581],
+    [-82.9174417, 41.9805935],
+    [-82.9025312, 41.9843369],
+    [-82.8903662, 41.9887809],
+    [-82.880775, 41.9909271],
+    [-82.8693618, 41.9918562],
+    [-82.8620745, 41.9924308],
+    [-82.8535852, 41.9940894],
+    [-82.8472493, 41.9948546],
+    [-82.8421306, 41.9953638],
+    [-82.8373862, 41.9952334],
+    [-82.8107287, 41.9987949],
+    [-82.8038885, 42.0012216],
+    [-82.7830557, 42.0093872],
+    [-82.7784684, 42.0102832],
+    [-82.7740991, 42.0127126],
+    [-82.7623441, 42.0187116],
+    [-82.7517014, 42.0224265],
+    [-82.7469808, 42.0244197],
+    [-82.7429146, 42.024926],
+    [-82.7383333, 42.0253684],
+    [-82.7351791, 42.0251055],
+    [-82.7335054, 42.0240696],
+    [-82.7318706, 42.0246733],
+    [-82.7303214, 42.0285925],
+    [-82.7248922, 42.0300829],
+    [-82.7175744, 42.0320832],
+    [-82.7123802, 42.0318756],
+    [-82.7054692, 42.0312531],
+    [-82.6970132, 42.0319051],
+    [-82.6936648, 42.0325334],
+    [-82.691003, 42.0322692],
+    [-82.6858508, 42.0341631],
+    [-82.6808699, 42.0359926],
+    [-82.6691524, 42.0362376],
+    [-82.6555467, 42.03476],
+    [-82.5982839, 42.0262233],
+    [-82.5629353, 41.9984122],
+    [-82.549372, 41.9876968],
+    [-82.5213931, 41.9861641],
+    [-82.5006231, 41.9871855],
+    [-82.4928974, 41.9953504],
+    [-82.4904941, 42.3076582],
+    [-82.5313495, 42.3117205],
+    [-82.5476573, 42.3168026],
+    [-82.5677427, 42.3168039],
+    [-82.6027607, 42.3079121],
+    [-82.6400149, 42.301324],
+    [-82.6752049, 42.3003108],
+    [-82.7246404, 42.2975013],
+    [-82.7479388, 42.2996683],
+    [-82.771581, 42.3025923],
+    [-82.802048, 42.3107212],
+    [-82.8411038, 42.3203628],
+    [-82.8551033, 42.325175],
+    [-82.9131248, 42.3393879],
   ],
+]);
+//console.log(points, "og points");
+function generatePoints(
+  inputPoints: Array<[number, number]>,
+  radius: number
+): Array<[number, number]> {
+  // console.log(inputPoints, "input points");
+  return [
+    ...new Set(
+      ((): Array<unknown> => {
+        let circles = inputPoints
+          .map((pnt) => turf.point([pnt[1], pnt[0]]))
+          .map((tpnt) =>
+            //@ts-expect-error idk some error with ts wrong version of type file
+            circle(tpnt, radius + 1, { steps: 10 })
+          );
+        let lines = circles.map((p) => polygonToLine(p));
+        let intersectionsAndPerimeter = lines
+          .map((tft, ind, arr) => {
+            let spliced = [...arr.slice(0, ind), ...arr.slice(ind + 1)];
+            let vals = spliced.map((l) => lineIntersect(tft, l)).flat();
+            return [...vals, ...tft.geometry.coordinates];
+          })
+          .flat();
+        let mappedToCoords = intersectionsAndPerimeter
+          .map((p) => {
+            if (!p.features) {
+              //          console.log(p);
+              return p;
+            } else if (
+              p.features[Math.floor(Math.random() * p.features.length)]
+            ) {
+              return p.features[Math.floor(Math.random() * p.features.length)]
+                .geometry.coordinates;
+            } else {
+              //      console.log(p, "idk");
+              return undefined;
+            }
+          })
+          .filter(Boolean);
+        return mappedToCoords;
+      })()
+    ),
+    //@ts-expect-error there is a filter boolean 2 lines above idk why typescript capping
+  ].map((p) => [p[0], p[1]]);
+}
+function cleanPoints(
+  inputPoints: Array<[number, number]>
+): Array<[number, number]> {
+  let validPoints: Feature<Point, GeoJsonProperties>[] = [];
+  inputPoints
+    .reverse()
+    .map(turf.point)
+    .forEach((pnt) => {
+      if (booleanPointInPolygon(pnt, maxArea)) {
+        if (!validPoints.length) return validPoints.push(pnt);
+        if (validPoints.every((p) => turf.distance(pnt, p) >= radius)) {
+          validPoints.push(pnt);
+          return;
+        }
+      }
+    });
+  return validPoints.map((pnt) => [
+    pnt.geometry.coordinates[0],
+    pnt.geometry.coordinates[1],
+  ]);
+}
+let radius = 3;
+function addToPoints(pnts: number[][]) {
+  pnts.forEach((pnt: number[]) => points.value.push([pnt[1], pnt[0]]));
+}
+let genpoints = generatePoints(points.value as [number, number][], radius);
+let cleanedPoints = cleanPoints(genpoints);
+let genpoints2 = generatePoints(
+  cleanedPoints.concat(points.value as [number, number][]) as [
+    number,
+    number
+  ][],
+  radius
+);
+let cleaned2 = cleanPoints(genpoints2);
+addToPoints(cleanedPoints);
+addToPoints(cleaned2);
+addToPoints(generatePoints(genpoints2, radius));
+console.log(genpoints, "ok");
+/*
+async function recursivePointGen(
+  array: Array<[number, number]>
+): Promise<[number, number][]> {
+  //alert("new points" + array.length);
+  let newPoints = cleanPoints(generatePoints(array, radius).concat(array));
+  //alert("newer points" + (newPoints.length - array.length));
+  // return (await generatePoints(newPoints, radius)).concat(newPoints);
+  if (newPoints.length > 0 && array.length < 200) {
+    return recursivePointGen(newPoints.concat(array));
+  } else {
+    return array;
+  }
+}
+recursivePointGen(points.value, 0).then((pnts) => {
+  pnts = pnts.map((pnt) => {
+    if (pnt[0] < 40.3) {
+      return [pnt[1], pnt[0]];
+    } else {
+      return pnt;
+    }
+  });
+  console.log(pnts, "new points");
+
+  pnts.forEach((pnt) => points.value.push([pnt[1], pnt[0]]));
+  console.log(points.value, "points");
+  points.value = points.value.map((pnt) => {
+    if (pnt[0] < 40.3) {
+      return [pnt[1], pnt[0]];
+    } else {
+      return pnt;
+    }
+  });
 });
+//newerPoints.forEach((pnt) => points.push(pnt));
+      */
 </script>
 
 <template>
   <main>
-    <MapView :points="points.points" class="map" />
+    <MapView :points="points" class="map" />
     <div class="cont">
-      <div class="obj"></div>
-      <div class="obj"></div>
-      <div class="obj"></div>
-      <div class="obj"></div>
-      <div class="obj"></div>
-      <div class="obj"></div>
-      <div class="obj"></div>
-      <div class="obj"></div>
+      <div class="obj">t</div>
+      <div class="obj">t</div>
+      <div class="obj">t</div>
+      <div class="obj">
+        <p>t</p>
+      </div>
+      <div class="obj">t</div>
+      <div class="obj">t</div>
+      <div class="obj">t</div>
+      <div class="obj">t</div>
     </div>
   </main>
 </template>
@@ -64,24 +328,27 @@ main {
 .cont {
   position: fixed;
   z-index: 1;
-  top: 0;
+  top: 90px;
   left: 0;
-  width: 100%;
-  height: 100%;
+  bottom: 20px;
+  height: 98%;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   flex-wrap: wrap;
   align-content: flex-start;
   justify-content: flex-start;
   align-items: flex-start;
+  padding-bottom: 40px;
 }
 .obj {
   position: relative;
   z-index: 2;
   background-color: green;
   opacity: 0.5;
-  height: 10%;
-  width: 10%;
-  margin: 2%;
+  width: 90px;
+  height: 100px;
+  margin: 7%;
+  text-align: center;
+  text-decoration: underline;
 }
 </style>

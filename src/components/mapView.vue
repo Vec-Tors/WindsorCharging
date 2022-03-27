@@ -8,19 +8,37 @@
       <l-marker
         class="mark"
         v-for="point of this.OldPoints"
-        :lat-lng="point"
+        :lat-lng="[
+          point.geometry.coordinates[1],
+          point.geometry.coordinates[0],
+        ]"
         :key="point[0]"
         :icon="this.icon"
       >
+        <l-popup>
+          Address:
+          {{ point.properties.street_address }}
+          Lat: {{ point.geometry.coordinates[1] }} Long:
+          {{ point.geometry.coordinates[0] }}
+        </l-popup>
       </l-marker>
 
       <l-marker
         class="mark"
         v-for="point of this.NewPoints"
-        :lat-lng="point"
+        :lat-lng="[
+          point.geometry.coordinates[1],
+          point.geometry.coordinates[0],
+        ]"
         :key="point[0]"
         :icon="this.iconB"
       >
+        <l-popup>
+          Address:
+          {{ point.properties.address }}\n Lat:
+          {{ point.geometry.coordinates[1] }} Long:
+          {{ point.geometry.coordinates[0] }}
+        </l-popup>
       </l-marker>
       <l-control-layers />
     </l-map>
@@ -31,6 +49,7 @@ import {
   LMap,
   LTileLayer,
   LMarker,
+  LPopup,
   LControlLayers,
 } from "@vue-leaflet/vue-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -41,6 +60,7 @@ export default {
     LMap,
     LTileLayer,
     LMarker,
+    LPopup,
     LControlLayers,
   },
   props: {

@@ -53,9 +53,9 @@
         type="checkbox"
         class="inpField"
         @change="
-          () => {
+          (c) => {
             $emit('data', configValues);
-            
+            console.log(c);
           }
         "
       />

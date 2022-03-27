@@ -12,35 +12,8 @@ import lineIntersect from "@turf/line-intersect";
 import booleanPointInPolygon from "@turf/boolean-point-in-polygon";
 import type { Feature, Point, GeoJsonProperties } from "geojson";
 */
-let points = ref([
-  [42.167112, -82.816715],
-  [42.173674, -82.819467],
-  [42.183564, -82.83277],
-  [42.2498644, -82.9496771],
-  [42.226898, -82.994958],
-  [42.226869, -82.995019],
-  [42.308918, -82.870616],
-  [42.036245, -82.714061],
-  [42.034764, -82.917965],
-  [42.314019, -82.916044],
-  [42.24031, -83.013994],
-  [42.313713, -82.924253],
-  [42.282045, -82.981717],
-  [42.273189, -83.00278],
-  [42.27347, -83.00262],
-  [42.273293, -83.00354],
-  [42.274246, -83.006671],
-  [42.292654, -83.012514],
-  [42.305572, -83.001366],
-  [42.299522, -83.012098],
-  [42.245404, -83.058533],
-  [42.273169, -83.047966],
-  [42.239116, -82.550227],
-  [42.325065, -83.007556],
-  [42.3172986, -83.0444972],
-  [42.241722, -83.102857],
-]);
-let newPoints = ref([[0, 0]]);
+let points = ref([]);
+let newPoints = ref([]);
 
 /*
 let maxArea = turf.polygon([
@@ -296,7 +269,7 @@ recursivePointGen(points.value, 0).then((pnts) => {
       return pnt;
     }
   });
-});
+});   
 //newerPoints.forEach((pnt) => points.push(pnt));
       */
 let configs = ref({
@@ -315,6 +288,7 @@ let configs = ref({
     "TESLA",
   ],
 });
+updateArray(configs.value);
 function updateArray(updatedValues: any) {
   console.log(configs.value);
   console.log(updatedValues);
@@ -325,19 +299,14 @@ function updateArray(updatedValues: any) {
       return res.json();
     })
     .then((txt) => {
-      console.log(txt);
-      points.value = txt.features.map(
-        (feat: { geometry: { coordinates: unknown } }) => [
-          feat.geometry.coordinates[1],
-          feat.geometry.coordinates[0],
-        ]
-      );
+      console.log(txt, "gst");
+      points.value = txt.features;
       console.log(points.value);
     });
   if (updatedValues.showGenerated) {
     fetch(
       "https://96d2-68-196-246-133.ngrok.io/recommended-chargers?quantity=" +
-        configs.value.amountToGenerate
+        updatedValues.amountToGenerate
     )
       .then((res) => {
         console.log(res);
@@ -345,12 +314,7 @@ function updateArray(updatedValues: any) {
       })
       .then((txt) => {
         console.log(txt, "ok");
-        newPoints.value = txt.map(
-          (feat: { geometry: { coordinates: unknown } }) => [
-            feat.geometry.coordinates[1],
-            feat.geometry.coordinates[0],
-          ]
-        );
+        newPoints.value = txt;
         console.log(points.value);
       });
   } else {

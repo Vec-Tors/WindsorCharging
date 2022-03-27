@@ -40,6 +40,8 @@ let points = ref([
   [42.3172986, -83.0444972],
   [42.241722, -83.102857],
 ]);
+let newPoints = ref([[0, 0]]);
+
 /*
 let maxArea = turf.polygon([
   [
@@ -297,22 +299,89 @@ recursivePointGen(points.value, 0).then((pnts) => {
 });
 //newerPoints.forEach((pnt) => points.push(pnt));
       */
-fetch(
-  "https://developer.nrel.gov/api/alt-fuel-stations/v1/nearest.geojson?api_key=rx9NyAm69CnSZXGoAAObTyGGnXD4LgND6ui3gYkX&location=1617+Cole+Blvd+Golden+CO&fuel_type=ELEC&limit=1"
-)
-  .then((res) => res.json())
-  .then(console.log);
+let configs = ref({
+  showExisting: true,
+  showDisabled: true,
+  showGenerated: false,
+  showOperational: true,
+  amountToGenerate: 10,
+  chargers: [
+    "NEMA1450",
+    "NEMA515",
+    "NEMA520",
+    "J1772",
+    "J1772COMBO",
+    "CHADEMO",
+    "TESLA",
+  ],
+});
+function updateArray(updatedValues: any) {
+  console.log(configs.value);
+  console.log(updatedValues);
+
+  fetch("https://96d2-68-196-246-133.ngrok.io/existing-chargers")
+    .then((res) => {
+      console.log(res);
+      return res.json();
+    })
+    .then((txt) => {
+      console.log(txt);
+      points.value = txt.features.map(
+        (feat: { geometry: { coordinates: unknown } }) => [
+          feat.geometry.coordinates[1],
+          feat.geometry.coordinates[0],
+        ]
+      );
+      console.log(points.value);
+    });
+  if (updatedValues.showGenerated) {
+    fetch(
+      "https://96d2-68-196-246-133.ngrok.io/recommended-chargers?quantity=" +
+        configs.value.amountToGenerate
+    )
+      .then((res) => {
+        console.log(res);
+        return res.json();
+      })
+      .then((txt) => {
+        console.log(txt, "ok");
+        newPoints.value = txt.map(
+          (feat: { geometry: { coordinates: unknown } }) => [
+            feat.geometry.coordinates[1],
+            feat.geometry.coordinates[0],
+          ]
+        );
+        console.log(points.value);
+      });
+  } else {
+    newPoints.value = [];
+  }
+}
+fetch("https://96d2-68-196-246-133.ngrok.io/existing-chargers")
+  .then((res) => {
+    console.log(res);
+    return res.json();
+  })
+  .then((txt) => {
+    console.log(txt, "idk");
+  });
+console.log(newPoints.value);
 </script>
 
 <template>
   <main>
-    <MapView
-      :OldPoints="points"
-      :NewPoints="[[-83.1106666, 42.1633367]]"
-      class="map"
-    />
+    <MapView :OldPoints="points" :NewPoints="newPoints" class="map" />
     <div class="cont">
-      <ConfigBox class="obj" />
+      <ConfigBox
+        :amount-to-generate="configs.amountToGenerate"
+        :show-disabled="configs.showDisabled"
+        :chargers="configs.chargers"
+        @data="updateArray"
+        :show-operational="configs.showOperational"
+        :show-existing="configs.showExisting"
+        :show-generated="configs.showGenerated"
+        class="obj"
+      />
     </div>
   </main>
 </template>
@@ -329,8 +398,7 @@ main {
   position: fixed;
   z-index: 0;
 }
-.cont {
-}
+
 .obj {
   position: relative;
   z-index: 2;
